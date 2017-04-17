@@ -12,8 +12,8 @@ if exist "%ProgramFiles%\MSBuild\14.0\bin" SET MSBUILDEXEDIR=%ProgramFiles%\MSBu
 if exist "%ProgramFiles(x86)%\MSBuild\15.0\bin" SET MSBUILDEXEDIR=%ProgramFiles(x86)%\MSBuild\15.0\bin
 if exist "%ProgramFiles%\MSBuild\15.0\bin" SET MSBUILDEXEDIR=%ProgramFiles%\MSBuild\15.0\bin
 if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin" SET MSBUILDEXEDIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin
-
-
+if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin" SET MSBUILDEXEDIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin
+if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin" SET MSBUILDEXEDIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin
 
 @REM Can't multi-block if statement when check condition contains '(' and ')' char, so do as single line checks
 if NOT "%MSBUILDEXEDIR%" == "" SET MSBUILDEXE=%MSBUILDEXEDIR%\MSBuild.exe
