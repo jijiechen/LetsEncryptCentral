@@ -60,6 +60,8 @@
     <Compile Include="CertificateClient.cs" />
     <Compile Include="ClientHelper.cs" />
     <Compile Include="DnsAuthorizer.cs" />
+    <Compile Include="DnsProviders\DnsPodProvider.cs" />
+    <Compile Include="DnsProviders\IDnsProvider.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="CertManagerConfiguration.cs" />
     <Compile Include="Program.cs" />
