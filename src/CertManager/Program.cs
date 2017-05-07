@@ -29,22 +29,26 @@ namespace CertManager
 
             RS256Signer signer;
             AcmeRegistration registration;
+            AcmeClient client;
             if (File.Exists(registrationPath) && File.Exists(signerPath))
             {
                 registration = RegistrationHelper.LoadFromFile(registrationPath);
                 signer = SignerHelper.LoadFromFile(signerPath);
+
+                client = ClientHelper.CreateAcmeClient(signer, registration);
             }
             else
             {
                 signer = new RS256Signer();
                 signer.Init();
-
-                registration = RegistrationHelper.CreateNew(signer, defaultContact);
                 SignerHelper.SaveToFile(signer, signerPath);
+
+                client = ClientHelper.CreateAcmeClient(signer, null);
+                client.Registration = registration = RegistrationHelper.CreateNew(client, defaultContact);
+                RegistrationHelper.SaveToFile(registration, registrationPath);
             }
 
 
-            var client = ClientHelper.CreateAcmeClient(signer, registration);
             var certProvider = CertificateProvider.GetProvider();
 
             try

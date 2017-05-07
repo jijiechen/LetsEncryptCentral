@@ -6,16 +6,13 @@ namespace CertManager
 {
     class RegistrationHelper
     {
-        public static AcmeRegistration CreateNew(RS256Signer signer, string contactEmail)
+        public static AcmeRegistration CreateNew(AcmeClient client, string contactEmail)
         {
-            using (var client = ClientHelper.CreateAcmeClient(signer, null))
-            {
-                var contacts = new[] { contactEmail };
-                var registration = client.Register(contacts);
-                client.UpdateRegistration(true, true);
+            var contacts = new[] { "mailto:" + contactEmail };
+            var registration = client.Register(contacts);
+            client.UpdateRegistration(true, true);
 
-                return registration;
-            }
+            return registration;
         }
 
         public static AcmeRegistration LoadFromFile(string filePath)
