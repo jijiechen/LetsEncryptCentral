@@ -1,0 +1,6 @@
+45013
+46824cefe822321668afc94abfb7892d
+mydomain.com
+
+# In this file, only the first three lines are useful.
+# Please get your tokens from DNSPod. Please see https://support.dnspod.cn/Kb/showarticle/tsid/227/

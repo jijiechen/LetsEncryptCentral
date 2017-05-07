@@ -4,6 +4,7 @@ using System.IO;
 using ACMESharp.PKI;
 using CertManager.DnsProviders;
 using System;
+using System.Linq;
 
 namespace CertManager
 {
@@ -18,10 +19,6 @@ namespace CertManager
             var registrationPath = Path.Combine(appPath, "registration");
 
             var defaultContact = "someone@someplace.com";
-            var hostName = "hehe.com";
-            var dnspodUser = "me";
-            var dnspodApiKey = "you";
-            var pfxFilePath = Path.Combine(Directory.GetCurrentDirectory(), hostName + ".pfx");
             var pfxPassword = string.Empty;
 
             Console.Title = "CertManager";
@@ -47,16 +44,17 @@ namespace CertManager
                 client.Registration = registration = RegistrationHelper.CreateNew(client, defaultContact);
                 RegistrationHelper.SaveToFile(registration, registrationPath);
             }
-
-
+            
             var certProvider = CertificateProvider.GetProvider();
 
             try
             {
-                var dnsProvider = new DnsPodProvider(dnspodUser, dnspodApiKey, hostName);
+                var dnsProvider = CreateDnsPodProviderFromFile(out string domainName);
+                var hostName = "net." + domainName;
                 DnsAuthorizer.Authorize(client, dnsProvider, hostName);
 
                 var cert = CertificateClient.RequestCertificate(client, certProvider, hostName);
+                var pfxFilePath = Path.Combine(Directory.GetCurrentDirectory(), hostName + ".pfx");
                 ExportPfx(certProvider, cert, pfxFilePath, pfxPassword);
             }
             finally
@@ -66,6 +64,7 @@ namespace CertManager
                 certProvider.Dispose();
             }
         }
+
 
         static void ExportPfx(CertificateProvider certProvider, IssuedCertificate certificate, string filePath, string password)
         {
@@ -90,6 +89,13 @@ namespace CertManager
                 Console.Error.WriteLine(exception.Message);
                 Console.Error.WriteLine(exception.StackTrace);
             }
-        }
+       }
+
+        static DnsPodProvider CreateDnsPodProviderFromFile(out string domainName)
+        {
+            var lines = File.ReadLines("dnspod-token.txt").ToArray();
+            domainName = lines[2];
+            return new DnsPodProvider(int.Parse(lines[0]), lines[1], domainName);
+        } 
     }
 }

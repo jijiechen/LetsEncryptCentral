@@ -26,8 +26,7 @@ namespace CertManager
                 var challenge = client.DecodeChallenge(authzState, AcmeProtocol.CHALLENGE_TYPE_DNS);
 
                 var dnsChallenge = challenge.Challenge as DnsChallenge;
-
-                EditDns(dnsChallenge, dnsProvider, false);
+                var dnsRecordRef = AddRecordToDNS(dnsProvider, dnsChallenge);
 
                 try
                 {
@@ -48,7 +47,8 @@ namespace CertManager
                 }
                 finally
                 {
-                    EditDns(dnsChallenge, dnsProvider, delete: true);
+                    //if(!string.IsNullOrEmpty(dnsRecordRef))
+                    //    dnsProvider.RemoveTxtRecord(dnsRecordRef);
                 }
             }
 
@@ -58,22 +58,13 @@ namespace CertManager
             }
         }
 
-        static void EditDns(DnsChallenge dnsChallenge, IDnsProvider dnsProvider, bool delete = false)
+        static string AddRecordToDNS(IDnsProvider dnsProvider, DnsChallenge dnsChallenge)
         {
             var dnsName = dnsChallenge.RecordName;
+            var dnsValue = Regex.Replace(dnsChallenge.RecordValue, "\\s", "");
+            return dnsProvider.AddTxtRecord(dnsName, dnsValue);
 
-            if (delete)
-            {
-                dnsProvider.RemoveTxtRecord(dnsName);
-            }
-            else
-            {
-                var dnsValue = Regex.Replace(dnsChallenge.RecordValue, "\\s", "");
-                var dnsValues = Regex.Replace(dnsValue, "(.{100,100})", "$1\n").Split('\n');
-
-                dnsProvider.AddTxtRecord(dnsName, dnsValues);
-            }
+            // todo: resolve the txt record
         }
-
     }
 }
