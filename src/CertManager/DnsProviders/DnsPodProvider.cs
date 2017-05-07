@@ -29,15 +29,21 @@ namespace CertManager.DnsProviders
 
         public string AddTxtRecord(string name, string value)
         {
+            if (name.EndsWith(_domainName))
+            {
+                name = name.Substring(0, name.Length - _domainName.Length - 1);
+            }
+
             var parameters = new Dictionary<string, string>
             {
                 { "domain", _domainName },
                 { "record_type", "TXT" },
                 { "record_line_id", "0"},  // Record.Line: https://www.dnspod.cn/docs/domains.html#record-line
-                { "value", $"{name}={value}"}
+                { "sub_domain", name},
+                { "value", value}
             };
 
-            var uri = new Uri(new Uri(DnsPodBaseUri), new Uri(RecordCreateAPI));
+            var uri = new Uri(new Uri(DnsPodBaseUri), new Uri(RecordCreateAPI, UriKind.Relative));
             var content = GetRequestContent(parameters);
 
             var recordCreateResult = InvokeDnsPodAPI<DnsPodCreateRecordResponseObject>(uri, content);
@@ -57,7 +63,7 @@ namespace CertManager.DnsProviders
                 { "record_id", recordRef}
             };
 
-            var uri = new Uri(new Uri(DnsPodBaseUri), new Uri(RecordRemoveAPI));
+            var uri = new Uri(new Uri(DnsPodBaseUri), new Uri(RecordRemoveAPI, UriKind.Relative));
             var content = GetRequestContent(parameters);
             InvokeDnsPodAPI<DnsPodResponseObject>(uri, content);
         }
@@ -68,6 +74,11 @@ namespace CertManager.DnsProviders
             string responseContent = null;
             try
             {
+                if (_httpClient.DefaultRequestHeaders.UserAgent.Count < 1)
+                {
+                    _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36");
+                }
+
                 response = _httpClient.PostAsync(uri, content).Result;
                 responseContent = response.Content.ReadAsStringAsync().Result;
                 var apiResponse = JsonConvert.DeserializeObject<T>(responseContent);
@@ -95,7 +106,7 @@ namespace CertManager.DnsProviders
             // Common parameters defined by DNSPod. See https://www.dnspod.cn/docs/info.html#common-parameters
             var allParameters = new Dictionary<string, string>()
             {
-                { "login_token", _tokenValue },
+                { "login_token", string.Format("{0},{1}", _tokenId, _tokenValue)},
                 { "format", "json" },
                 { "lang", "en" },
                 { "error_on_empty", "yes" }

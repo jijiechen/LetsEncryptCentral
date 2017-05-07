@@ -15,22 +15,25 @@ namespace CertManager
         static void Main(string[] args)
         {
             var appPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var signerPath = Path.Combine(appPath, "signer");
-            var registrationPath = Path.Combine(appPath, "registration");
+            var clientSignerPath = Path.Combine(appPath, "sign.key");
+            var registrationPath = Path.Combine(appPath, "reg.json");
 
             var defaultContact = "someone@someplace.com";
+            var subdomain = "net";
             var pfxPassword = string.Empty;
-
+#if !DEBUG
+            GlobalConfiguration.AcmeServerBaseUri = "https://acme-v01.api.letsencrypt.org/";
+#endif
             Console.Title = "CertManager";
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
             RS256Signer signer;
             AcmeRegistration registration;
             AcmeClient client;
-            if (File.Exists(registrationPath) && File.Exists(signerPath))
+            if (File.Exists(registrationPath) && File.Exists(clientSignerPath))
             {
                 registration = RegistrationHelper.LoadFromFile(registrationPath);
-                signer = SignerHelper.LoadFromFile(signerPath);
+                signer = SignerHelper.LoadFromFile(clientSignerPath);
 
                 client = ClientHelper.CreateAcmeClient(signer, registration);
             }
@@ -38,7 +41,7 @@ namespace CertManager
             {
                 signer = new RS256Signer();
                 signer.Init();
-                SignerHelper.SaveToFile(signer, signerPath);
+                SignerHelper.SaveToFile(signer, clientSignerPath);
 
                 client = ClientHelper.CreateAcmeClient(signer, null);
                 client.Registration = registration = RegistrationHelper.CreateNew(client, defaultContact);
@@ -50,8 +53,14 @@ namespace CertManager
             try
             {
                 var dnsProvider = CreateDnsPodProviderFromFile(out string domainName);
-                var hostName = "net." + domainName;
-                DnsAuthorizer.Authorize(client, dnsProvider, hostName);
+                DnsAuthorizer.Authorize(client, dnsProvider, domainName);
+
+                var hostName = domainName;
+                if (!string.IsNullOrEmpty(subdomain))
+                {
+                    hostName = $"{subdomain}.{domainName}";
+                    DnsAuthorizer.Authorize(client, dnsProvider, hostName);
+                }
 
                 var cert = CertificateClient.RequestCertificate(client, certProvider, hostName);
                 var pfxFilePath = Path.Combine(Directory.GetCurrentDirectory(), hostName + ".pfx");

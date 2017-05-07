@@ -38,6 +38,8 @@ namespace CertManager
             using (var ms = new MemoryStream())
             {
                 certRequest.SaveCertificate(ms);
+
+                ms.Seek(0, SeekOrigin.Begin);
                 crt = certProvider.ImportCertificate(EncodingFormat.DER, ms);
             }
             var caCrt = GetCACertificate(certProvider, certRequest);
@@ -64,6 +66,8 @@ namespace CertManager
             using (var bs = new MemoryStream())
             {
                 provider.ExportCsr(csr, EncodingFormat.DER, bs);
+
+                bs.Seek(0, SeekOrigin.Begin);
                 derRaw = bs.ToArray();
             }
 

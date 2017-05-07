@@ -27,6 +27,7 @@ namespace CertManager
 
                 var dnsChallenge = challenge.Challenge as DnsChallenge;
                 var dnsRecordRef = AddRecordToDNS(dnsProvider, dnsChallenge);
+                Thread.Sleep(3 * 1000); //  wait for the newly created TXT record to take effect
 
                 try
                 {
@@ -37,7 +38,7 @@ namespace CertManager
                     // todo: put timeout/retry limit in this loop
                     while (authzState.Status == "pending")
                     {
-                        Thread.Sleep(4000); // this has to be here to give ACME server a chance to think
+                        Thread.Sleep(3 * 1000); // this has to be here to give ACME server a chance to think
                         var newAuthzState = client.RefreshIdentifierAuthorization(authzState);
                         if (newAuthzState.Status != "pending")
                             authzState = newAuthzState;
@@ -47,8 +48,8 @@ namespace CertManager
                 }
                 finally
                 {
-                    //if(!string.IsNullOrEmpty(dnsRecordRef))
-                    //    dnsProvider.RemoveTxtRecord(dnsRecordRef);
+                    if (!string.IsNullOrEmpty(dnsRecordRef))
+                        dnsProvider.RemoveTxtRecord(dnsRecordRef);
                 }
             }
 
