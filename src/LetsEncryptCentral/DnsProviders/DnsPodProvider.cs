@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace CertManager.DnsProviders
+namespace LetsEncryptCentral.DnsProviders
 {
     class DnsPodProvider : IDnsProvider
     {

@@ -8,7 +8,7 @@ using System.IO;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 
-namespace CertManager
+namespace LetsEncryptCentral.CertManager
 {
     class IssuedCertificate
     {

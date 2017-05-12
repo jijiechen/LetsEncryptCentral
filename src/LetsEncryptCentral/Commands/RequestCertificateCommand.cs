@@ -3,12 +3,13 @@ using System.Linq;
 using Microsoft.Extensions.CommandLineUtils;
 using ACMESharp.PKI;
 using System.IO;
-using CertManager.DnsProviders;
+using LetsEncryptCentral.DnsProviders;
 using ACMESharp;
 using ACMESharp.JOSE;
 using System.Collections.Generic;
+using LetsEncryptCentral.CertManager;
 
-namespace CertManager.Commands
+namespace LetsEncryptCentral.Commands
 {
 
     class RequestCertificateCommand

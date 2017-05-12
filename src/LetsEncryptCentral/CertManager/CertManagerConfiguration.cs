@@ -1,4 +1,4 @@
-﻿namespace CertManager
+﻿namespace LetsEncryptCentral.CertManager
 {
     class CertManagerConfiguration
     {

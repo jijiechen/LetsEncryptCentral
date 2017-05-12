@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace CertManager.DnsProviders
+namespace LetsEncryptCentral.DnsProviders
 {
     interface IDnsProvider: IDisposable
     {

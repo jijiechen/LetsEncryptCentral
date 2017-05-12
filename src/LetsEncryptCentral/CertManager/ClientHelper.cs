@@ -3,7 +3,7 @@ using ACMESharp.JOSE;
 using System;
 using System.Net;
 
-namespace CertManager
+namespace LetsEncryptCentral.CertManager
 {
     class ClientHelper
     {

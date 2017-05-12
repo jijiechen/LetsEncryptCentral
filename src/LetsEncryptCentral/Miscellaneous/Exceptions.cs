@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CertManager
+namespace LetsEncryptCentral
 {
     class AuthorizationFailedException: Exception
     {

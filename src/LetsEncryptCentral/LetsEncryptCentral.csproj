@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{C42487BD-6BF7-4FD3-BA48-894DF749D63A}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>CertManager</RootNamespace>
-    <AssemblyName>CertManager</AssemblyName>
+    <RootNamespace>LetsEncryptCentral</RootNamespace>
+    <AssemblyName>lec</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -81,22 +81,22 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CertificateExporter.cs" />
-    <Compile Include="CertificateClient.cs" />
-    <Compile Include="ClientHelper.cs" />
+    <Compile Include="CertManager\CertificateExporter.cs" />
+    <Compile Include="CertManager\CertificateClient.cs" />
+    <Compile Include="CertManager\ClientHelper.cs" />
     <Compile Include="Commands\RequestCertificateCommand.cs" />
     <Compile Include="Commands\RegisterAccountCommand.cs" />
-    <Compile Include="DnsAuthorizer.cs" />
+    <Compile Include="CertManager\DnsAuthorizer.cs" />
     <Compile Include="DnsProviders\DnsPodProvider.cs" />
-    <Compile Include="DnsProviders\DnsProviderInitializationException.cs" />
+    <Compile Include="Miscellaneous\DnsProviderInitializationException.cs" />
     <Compile Include="DnsProviders\IDnsProvider.cs" />
-    <Compile Include="DnsProviders\KVConfigurationParser.cs" />
-    <Compile Include="Exceptions.cs" />
-    <Compile Include="CertManagerConfiguration.cs" />
+    <Compile Include="Miscellaneous\KVConfigurationParser.cs" />
+    <Compile Include="Miscellaneous\Exceptions.cs" />
+    <Compile Include="CertManager\CertManagerConfiguration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RegistrationHelper.cs" />
-    <Compile Include="SignerHelper.cs" />
+    <Compile Include="CertManager\RegistrationHelper.cs" />
+    <Compile Include="CertManager\SignerHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CertManager.DnsProviders
+namespace LetsEncryptCentral
 {
     class KVConfigurationParser
     {

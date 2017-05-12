@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CertManager.DnsProviders
+namespace LetsEncryptCentral
 {
     class DnsProviderInitializationException: Exception
     {

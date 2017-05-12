@@ -1,9 +1,10 @@
 ﻿using ACMESharp.JOSE;
+using LetsEncryptCentral.CertManager;
 using Microsoft.Extensions.CommandLineUtils;
 using System;
 using System.IO;
 
-namespace CertManager.Commands
+namespace LetsEncryptCentral.Commands
 {
     class RegisterAccountCommand
     {

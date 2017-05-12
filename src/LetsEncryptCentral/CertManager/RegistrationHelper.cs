@@ -2,7 +2,7 @@
 using ACMESharp.JOSE;
 using System.IO;
 
-namespace CertManager
+namespace LetsEncryptCentral.CertManager
 {
     class RegistrationHelper
     {

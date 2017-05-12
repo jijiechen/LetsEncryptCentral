@@ -1,9 +1,10 @@
 ﻿using System;
 using Microsoft.Extensions.CommandLineUtils;
 using System.Reflection;
-using CertManager.Commands;
+using LetsEncryptCentral.Commands;
+using LetsEncryptCentral.CertManager;
 
-namespace CertManager
+namespace LetsEncryptCentral
 {
     class Program
     {
