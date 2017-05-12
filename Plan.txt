@@ -1,0 +1,7 @@
+
+1. accept reg files
+2. hostname?
+4. DNSProvider
+
+
+3. output file path?   (Support mutiple formats)

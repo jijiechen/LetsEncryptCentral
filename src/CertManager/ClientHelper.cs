@@ -7,7 +7,7 @@ namespace CertManager
 {
     class ClientHelper
     {
-        public static AcmeClient CreateAcmeClient(RS256Signer signer, AcmeRegistration registration)
+        public static AcmeClient CreateAcmeClient(ISigner signer, AcmeRegistration registration)
         {
             var client = new AcmeClient(new Uri(Program.GlobalConfiguration.AcmeServerBaseUri), new AcmeServerDirectory(), signer, registration);
             if (!string.IsNullOrWhiteSpace(Program.GlobalConfiguration.ProxyUri))

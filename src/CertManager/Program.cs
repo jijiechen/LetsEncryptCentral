@@ -1,93 +1,42 @@
-﻿using ACMESharp;
-using ACMESharp.JOSE;
-using System.IO;
-using ACMESharp.PKI;
-using CertManager.DnsProviders;
-using System;
-using System.Linq;
+﻿using System;
+using Microsoft.Extensions.CommandLineUtils;
+using System.Reflection;
+using CertManager.Commands;
 
 namespace CertManager
 {
     class Program
     {
+        public const string ApplicationName = "lec";
         public static CertManagerConfiguration GlobalConfiguration = new CertManagerConfiguration();
 
         static void Main(string[] args)
         {
-            var appPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var clientSignerPath = Path.Combine(appPath, "sign.key");
-            var registrationPath = Path.Combine(appPath, "reg.json");
-
-            var defaultContact = "someone@someplace.com";
-            var subdomain = "net";
-            var pfxPassword = string.Empty;
-#if !DEBUG
-            GlobalConfiguration.AcmeServerBaseUri = "https://acme-v01.api.letsencrypt.org/";
-#endif
-            Console.Title = "CertManager";
+            Console.Title = "lec";
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            RS256Signer signer;
-            AcmeRegistration registration;
-            AcmeClient client;
-            if (File.Exists(registrationPath) && File.Exists(clientSignerPath))
+            var app = new CommandLineApplication();
+            app.Name = ApplicationName;
+            app.FullName = "A central Let's Encrypt client that apply certificates use the DNS-01 challenge";
+
+            var optionVerbose = app.Option("-v|--verbose", "Show verbose output", CommandOptionType.NoValue);
+            app.HelpOption("-?|-h|--help");
+            app.VersionOption("--version", Assembly.GetExecutingAssembly().GetName().Version.ToString());
+
+            // Show help information if no subcommand/option was specified
+            app.OnExecute(() =>
             {
-                registration = RegistrationHelper.LoadFromFile(registrationPath);
-                signer = SignerHelper.LoadFromFile(clientSignerPath);
+                app.ShowHelp();
+                return 9;
+            });
 
-                client = ClientHelper.CreateAcmeClient(signer, registration);
-            }
-            else
-            {
-                signer = new RS256Signer();
-                signer.Init();
-                SignerHelper.SaveToFile(signer, clientSignerPath);
+            app.Command("reg", new RegisterAccountCommand().Setup);
+            app.Command("apply", new RequestCertificateCommand().Setup);
 
-                client = ClientHelper.CreateAcmeClient(signer, null);
-                client.Registration = registration = RegistrationHelper.CreateNew(client, defaultContact);
-                RegistrationHelper.SaveToFile(registration, registrationPath);
-            }
-            
-            var certProvider = CertificateProvider.GetProvider();
-
-            try
-            {
-                var dnsProvider = CreateDnsPodProviderFromFile(out string domainName);
-                DnsAuthorizer.Authorize(client, dnsProvider, domainName);
-
-                var hostName = domainName;
-                if (!string.IsNullOrEmpty(subdomain))
-                {
-                    hostName = $"{subdomain}.{domainName}";
-                    DnsAuthorizer.Authorize(client, dnsProvider, hostName);
-                }
-
-                var cert = CertificateClient.RequestCertificate(client, certProvider, hostName);
-                var pfxFilePath = Path.Combine(Directory.GetCurrentDirectory(), hostName + ".pfx");
-                ExportPfx(certProvider, cert, pfxFilePath, pfxPassword);
-            }
-            finally
-            {
-                signer.Dispose();
-                client.Dispose();
-                certProvider.Dispose();
-            }
+            app.Execute(args);
         }
 
-
-        static void ExportPfx(CertificateProvider certProvider, IssuedCertificate certificate, string filePath, string password)
-        {
-            using (var fileStream = File.Create(filePath))
-            {
-                certProvider.ExportArchive(
-                    certificate.PrivateKey,
-                    new[] { certificate.PublicKey, certificate.CAPublicKey },
-                    ArchiveFormat.PKCS12,
-                    fileStream,
-                    password);
-            }
-        }
-
+        
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             Console.Error.WriteLine("!!! Unhandled exception has occured,  application is now exiting!");
@@ -98,13 +47,9 @@ namespace CertManager
                 Console.Error.WriteLine(exception.Message);
                 Console.Error.WriteLine(exception.StackTrace);
             }
-       }
 
-        static DnsPodProvider CreateDnsPodProviderFromFile(out string domainName)
-        {
-            var lines = File.ReadLines("dnspod-token.txt").ToArray();
-            domainName = lines[2];
-            return new DnsPodProvider(int.Parse(lines[0]), lines[1], domainName);
-        } 
+            Environment.Exit(999);
+       }
+        
     }
 }

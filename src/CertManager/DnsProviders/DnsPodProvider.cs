@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,19 +11,26 @@ namespace CertManager.DnsProviders
     class DnsPodProvider : IDnsProvider
     {
         readonly HttpClient _httpClient = new HttpClient();
-        readonly int _tokenId;
-        readonly string _tokenValue;
-        readonly string _domainName;
+        int _tokenId;
+        string _tokenValue;
+        string _domainName;
 
         const string DnsPodBaseUri = "https://dnsapi.cn/";
         const string RecordCreateAPI = "Record.Create";
         const string RecordRemoveAPI = "Record.Remove";
+        
 
-        public DnsPodProvider(int tokenId, string token, string domain)
+        public void Initialize(string configuration)
         {
-            _tokenId = tokenId;
-            _tokenValue = token;
-            _domainName = domain;
+            var conf = KVConfigurationParser.Parse(configuration,  new[] { "token_id", "token", "domain" });
+
+            if(!int.TryParse(conf["token_id"], out _tokenId))
+            {
+                throw new DnsProviderInitializationException("The 'token_id' configuration is not a valid number value.");
+            }
+            
+            _tokenValue = conf["token"];
+            _domainName = conf["domain"];
         }
 
         public string AddTxtRecord(string name, string value)
@@ -123,6 +129,11 @@ namespace CertManager.DnsProviders
             return content;
         }
 
+
+        public void Dispose()
+        {
+            
+        }
     }
 
     class DnsPodResponseException : Exception
@@ -166,8 +177,7 @@ namespace CertManager.DnsProviders
             public string Message { get; set; }
         }
     }
-
-
+    
     class DnsPodCreateRecordResponseObject: DnsPodResponseObject
     {
         public DnsPodDnsRecord Record { get; set; }
