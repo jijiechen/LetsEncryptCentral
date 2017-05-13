@@ -3,6 +3,8 @@ using LetsEncryptCentral.CertManager;
 using Microsoft.Extensions.CommandLineUtils;
 using System;
 using System.IO;
+using static LetsEncryptCentral.ConsoleUtils;
+using static LetsEncryptCentral.PathUtils;
 
 namespace LetsEncryptCentral.Commands
 {
@@ -12,7 +14,7 @@ namespace LetsEncryptCentral.Commands
         {
             command.Description = "Create a new Let's Encrypt registration.";
 
-            var optionTos = command.Option("--agree-tos", "Accept to the terms of services and subscriber agreement at https://letsencrypt.org/repository/", CommandOptionType.SingleValue);
+            var optionTos = command.Option("--accept-tos", "Accept to the terms of services and subscriber agreement at https://letsencrypt.org/repository/", CommandOptionType.NoValue);
             var optionContact = command.Option("-c|--contact <CONTACT_EMAIL>", "Email address to contact.", CommandOptionType.SingleValue);
             var optionOutReg = command.Option("-r|--out-reg <REGISTERTION_OUTPUT_FILE>", "A file path to output registeration information.", CommandOptionType.SingleValue);
             var optionOutSigner = command.Option("-s|--out-signer <REGISTERTION_OUTPUT_SIGNER>", "A file path to output signer information corresponds to the registeration.", CommandOptionType.SingleValue);
@@ -35,50 +37,63 @@ namespace LetsEncryptCentral.Commands
         {
             if (!options.AcceptTos)
             {
-                Console.Error.WriteLine("Could not create a registration before you accept the terms of services.");
+                ConsoleErrorOutput("Could not create a registration before you accept the terms of services at https://letsencrypt.org/repository/.");
                 return 11;
             }
-
             UseDefaultOptionsIfNeed(ref options);
+            Console.Write("Initializing...");
 
-            
             var signer = new RS256Signer();
-            signer.Init(); 
-
+            signer.Init();
             var client = ClientHelper.CreateAcmeClient(signer, null);
-            var registration = RegistrationHelper.CreateNew(client, options.ContactEmailAddress);
+            Console.WriteLine("Done.");
+            Console.WriteLine("Requesting new registration for {0}...", options.ContactEmailAddress);
 
+            var registration = RegistrationHelper.CreateNew(client, options.ContactEmailAddress);
             RegistrationHelper.SaveToFile(registration, options.OutputPathRegisteration);
             SignerHelper.SaveToFile(signer, options.OutputPathSigner);
+
+            Console.WriteLine("Registration created for {0}.", options.ContactEmailAddress);
+            Console.WriteLine("Registration profile saved at {0}.", options.OutputPathRegisteration);
+            Console.WriteLine("Registration signer saved at {0}.", options.OutputPathSigner);
 
             return 0;
         }
 
-        static void UseDefaultOptionsIfNeed(ref RegisterCommandOptions context)
+        static void UseDefaultOptionsIfNeed(ref RegisterCommandOptions options)
         {
-            if (string.IsNullOrWhiteSpace(context.ContactEmailAddress))
+            var contactGuid = string.Concat(Program.ApplicationName, "user.");
+
+            if (string.IsNullOrWhiteSpace(options.ContactEmailAddress))
             {
-                context.ContactEmailAddress = string.Concat(Program.ApplicationName, "user.", Guid.NewGuid().ToString("n").Substring(15, 8));
+                contactGuid += Guid.NewGuid().ToString("n").Substring(15);
+                options.ContactEmailAddress = string.Concat(contactGuid, "@example.com");
+            }
+            else
+            {
+                contactGuid += options.ContactEmailAddress.GetHashCode().ToString();
             }
 
+            if (string.IsNullOrWhiteSpace(options.OutputPathRegisteration))
+            {
+                options.OutputPathRegisteration = Path.Combine(AppliationPath, contactGuid + ".reg.json");
+            }
+            else
+            {
+                options.OutputPathRegisteration = PrepareOutputFilePath(options.OutputPathRegisteration, out string dir);
+                if (string.IsNullOrWhiteSpace(options.OutputPathSigner))
+                    options.OutputPathSigner = Path.Combine(dir, contactGuid + ".signer.key");
+            }
 
-            var appPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            if (string.IsNullOrWhiteSpace(context.OutputPathRegisteration))
+            if (string.IsNullOrWhiteSpace(options.OutputPathSigner))
             {
-                context.OutputPathRegisteration = Path.Combine(appPath, "reg.json");
+                options.OutputPathSigner = Path.Combine(AppliationPath, contactGuid + ".signer.key");
             }
-            else if (string.IsNullOrWhiteSpace(context.OutputPathSigner))
+            else
             {
-                context.OutputPathSigner = Path.Combine(Path.GetDirectoryName(context.OutputPathRegisteration), "signer.key");
-            }
-
-            if (string.IsNullOrWhiteSpace(context.OutputPathSigner))
-            {
-                context.OutputPathSigner = Path.Combine(appPath, "signer.key"); ;
-            }
-            else if (string.IsNullOrWhiteSpace(context.OutputPathRegisteration))
-            {
-                context.OutputPathRegisteration = Path.Combine(Path.GetDirectoryName(context.OutputPathSigner), "reg.json");
+                options.OutputPathSigner = PrepareOutputFilePath(options.OutputPathSigner, out string dir);
+                if (string.IsNullOrWhiteSpace(options.OutputPathRegisteration))
+                    options.OutputPathRegisteration = Path.Combine(dir, contactGuid + ".reg.json");
             }
         }
 

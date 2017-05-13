@@ -1,5 +1,4 @@
 ﻿using ACMESharp;
-using ACMESharp.JOSE;
 using System.IO;
 
 namespace LetsEncryptCentral.CertManager

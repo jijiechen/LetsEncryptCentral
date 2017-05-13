@@ -3,6 +3,7 @@ using Microsoft.Extensions.CommandLineUtils;
 using System.Reflection;
 using LetsEncryptCentral.Commands;
 using LetsEncryptCentral.CertManager;
+using static LetsEncryptCentral.ConsoleUtils;
 
 namespace LetsEncryptCentral
 {
@@ -16,11 +17,14 @@ namespace LetsEncryptCentral
             Console.Title = "lec";
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
+#if DEBUG
+            System.Diagnostics.Debugger.Launch();
+#endif
+
             var app = new CommandLineApplication();
             app.Name = ApplicationName;
-            app.FullName = "A central Let's Encrypt client that apply certificates use the DNS-01 challenge";
+            app.FullName = "A central Let's Encrypt client that applies certificates using the DNS-01 challenge";
 
-            var optionVerbose = app.Option("-v|--verbose", "Show verbose output", CommandOptionType.NoValue);
             app.HelpOption("-?|-h|--help");
             app.VersionOption("--version", Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
@@ -40,13 +44,12 @@ namespace LetsEncryptCentral
         
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Console.Error.WriteLine("!!! Unhandled exception has occured,  application is now exiting!");
-
+            ConsoleErrorOutput("!!! Unhandled exception has occured,  application is now exiting. !!!");
             var exception = e.ExceptionObject as Exception;
             if (exception != null)
             {
-                Console.Error.WriteLine(exception.Message);
-                Console.Error.WriteLine(exception.StackTrace);
+                ConsoleErrorOutput(exception.Message);
+                ConsoleErrorOutput(exception.StackTrace);
             }
 
             Environment.Exit(999);

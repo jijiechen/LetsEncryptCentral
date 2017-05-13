@@ -8,6 +8,8 @@ using ACMESharp;
 using ACMESharp.JOSE;
 using System.Collections.Generic;
 using LetsEncryptCentral.CertManager;
+using static LetsEncryptCentral.ConsoleUtils;
+using static LetsEncryptCentral.PathUtils;
 
 namespace LetsEncryptCentral.Commands
 {
@@ -75,23 +77,38 @@ namespace LetsEncryptCentral.Commands
                 return 210;
             }
 
-
+            Console.Write("Initializing...");
             CertificateProvider certProvider = null;
             var client = ClientHelper.CreateAcmeClient(requestContext.Signer, requestContext.Registration);
 
             try
             {
-                if(IsSubDomainName(options.CommonName, out string toplevel))
+                Console.WriteLine("Done.");
+                if (IsSubDomainName(options.CommonName, out string toplevel))
                 {
+                    Console.Write("Authorizing top level domain name {0}...", toplevel);
                     DnsAuthorizer.Authorize(client, requestContext.DnsProvider, toplevel);
+                    Console.WriteLine("Done.");
                 }
+                Console.Write("Authorizing domain name {0}...", options.CommonName);
                 DnsAuthorizer.Authorize(client, requestContext.DnsProvider, options.CommonName);
+                Console.WriteLine("Done.");
 
+                Console.Write("Requesting a new certificate for common name {0}...", options.CommonName);
                 certProvider = CertificateProvider.GetProvider();
                 var cert = CertificateClient.RequestCertificate(client, certProvider, options.CommonName);
 
-                var outputFile = PrepareOutputFilePath(options, Path.GetDirectoryName(options.OutputFile));
-                CertificateExporter.Export(certProvider, cert, options.OutputType, outputFile);
+                Console.WriteLine("Done.");
+                Console.WriteLine("Exporting certificate to file...");
+
+                var outTypeString = options.OutputType.ToString().ToLowerInvariant();
+                if (string.IsNullOrWhiteSpace(options.OutputFile))
+                {
+                    options.OutputFile = Path.Combine(AppliationPath, string.Concat(options.CommonName, '-', DateTime.Now.ToString("yyyyMMddHHmm"), '.', outTypeString));
+                }
+                options.OutputFile = PrepareOutputFilePath(options.OutputFile, out string dir);
+                CertificateExporter.Export(certProvider, cert, options.OutputType, options.OutputFile);
+                Console.WriteLine("Certificate has been exported as {0} format at {1}.", outTypeString, options.OutputFile); 
             }
             finally
             {
@@ -118,16 +135,6 @@ namespace LetsEncryptCentral.Commands
             return false;
         }
 
-        static string PrepareOutputFilePath(RequestNewCertificateOptions options, string outDir)
-        {
-            if (!Directory.Exists(outDir))
-            {
-                Directory.CreateDirectory(outDir);
-            }
-
-            return Path.Combine(Path.GetDirectoryName(options.OutputFile), Path.GetFileName(options.OutputFile));
-        }
-
         private CertRequestContext InitializeRequestContext(RequestNewCertificateOptions options)
         {
             var context = new CertRequestContext();
@@ -137,7 +144,7 @@ namespace LetsEncryptCentral.Commands
                 context.Registration = RegistrationHelper.LoadFromFile(options.RegisterationFile);
             }catch(Exception ex)
             {
-                Console.WriteLine($"Could not load registration file: {ex.Message}");
+                ConsoleErrorOutput($"Could not load registration file: {ex.Message}");
                 goto errorHandling;
             }
 
@@ -147,7 +154,7 @@ namespace LetsEncryptCentral.Commands
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Could not load registration file: {ex.Message}");
+                ConsoleErrorOutput($"Could not load signer file: {ex.Message}");
                 goto errorHandling;
             }
             
@@ -157,14 +164,14 @@ namespace LetsEncryptCentral.Commands
                 var dnsProviderType = AllSupportedDnsProviderTypes[options.DnsProviderName];
                 context.DnsProvider = Activator.CreateInstance(dnsProviderType) as IDnsProvider;
 
-                context.DnsProvider.Initialize(options.DnsProviderConfiguration);
+                context.DnsProvider.Initialize(options.DnsProviderConfiguration ?? string.Empty);
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"Could not load registration file: {ex.Message}");
+                ConsoleErrorOutput($"Could not initialize dns provider file: {ex.Message}");
                 goto errorHandling;
             }
-
+            return context;
 
             errorHandling:
             return null;
@@ -174,14 +181,14 @@ namespace LetsEncryptCentral.Commands
         {
             if (string.IsNullOrEmpty(options.CommonName))
             {
-                Console.Error.WriteLine("Could not request a certificate without a common name.");
+                ConsoleErrorOutput("Could not request a certificate without a common name.");
                 exitCode = 21;
                 return true;
             }
 
             if (!File.Exists(options.RegisterationFile))
             {
-                Console.Error.WriteLine($"Registeration file does not exist at {options.RegisterationFile}.");
+                ConsoleErrorOutput($"Registeration file does not exist at {options.RegisterationFile}.");
                 exitCode = 22;
                 return true;
             }
@@ -189,14 +196,14 @@ namespace LetsEncryptCentral.Commands
 
             if (!File.Exists(options.SignerFile))
             {
-                Console.Error.WriteLine($"Signer file does not exist at {options.SignerFile}.");
+                ConsoleErrorOutput($"Signer file does not exist at {options.SignerFile}.");
                 exitCode = 23;
                 return true;
             }
 
             if (!AllSupportedDnsProviderTypes.Keys.Contains(options.DnsProviderName))
             {
-                Console.Error.WriteLine($"Unknown DNS provider '{options.DnsProviderName}'. The supported providers are: {AllSupportedDnsProviderTypes}");
+                ConsoleErrorOutput($"Unknown DNS provider '{options.DnsProviderName}'. The supported providers are: {AllSupportedDnsProviderTypes}");
                 exitCode = 24;
                 return true;
             }
@@ -217,7 +224,7 @@ namespace LetsEncryptCentral.Commands
         {
             public string CommonName { get; set; }
 
-            public CertOutputType OutputType { get; set; } = CertOutputType.Pfx;
+            public CertOutputType OutputType { get; set; } = CertOutputType.Pem;
             public string OutputFile { get; set; }
             
             public string SignerFile { get; set; }

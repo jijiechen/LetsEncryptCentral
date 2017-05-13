@@ -88,11 +88,13 @@
     <Compile Include="Commands\RegisterAccountCommand.cs" />
     <Compile Include="CertManager\DnsAuthorizer.cs" />
     <Compile Include="DnsProviders\DnsPodProvider.cs" />
+    <Compile Include="Miscellaneous\ConsoleUtils.cs" />
     <Compile Include="Miscellaneous\DnsProviderInitializationException.cs" />
     <Compile Include="DnsProviders\IDnsProvider.cs" />
     <Compile Include="Miscellaneous\KVConfigurationParser.cs" />
     <Compile Include="Miscellaneous\Exceptions.cs" />
     <Compile Include="CertManager\CertManagerConfiguration.cs" />
+    <Compile Include="Miscellaneous\PathUtils.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CertManager\RegistrationHelper.cs" />
