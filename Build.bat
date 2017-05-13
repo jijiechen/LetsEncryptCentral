@@ -28,16 +28,16 @@ if NOT "%MSBUILDEXEDIR%" == "" GOTO :MsBuildFound
 
 :build
 @ECHO Installing packages...
-"%local%.nuget\NuGet.exe" restore "%local%MyBridge.sln"
+"%local%.nuget\NuGet.exe" restore "%local%LetsEncryptCentral.sln"
 @ECHO Building...
-"%MSBUILDEXE%" "%local%MyBridge.sln" /t:Rebuild /P:Configuration=Release
+"%MSBUILDEXE%" "%local%LetsEncryptCentral.sln" /t:Rebuild /P:Configuration=Release
 IF ERRORLEVEL 1 GOTO :end
 @goto copy
 
 
 
 :copy
-robocopy "%local%src\MyBridge\bin\Release" "%local%release" /e
+robocopy "%local%src\LetsEncryptCentral\bin\Release" "%local%release" /e
 @goto pack
 
 
