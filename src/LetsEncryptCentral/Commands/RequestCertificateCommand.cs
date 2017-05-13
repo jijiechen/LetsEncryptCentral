@@ -1,13 +1,13 @@
-﻿using System;
-using System.Linq;
-using Microsoft.Extensions.CommandLineUtils;
-using ACMESharp.PKI;
-using System.IO;
-using LetsEncryptCentral.DnsProviders;
-using ACMESharp;
+﻿using ACMESharp;
 using ACMESharp.JOSE;
-using System.Collections.Generic;
+using ACMESharp.PKI;
 using LetsEncryptCentral.CertManager;
+using LetsEncryptCentral.DnsProviders;
+using Microsoft.Extensions.CommandLineUtils;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using static LetsEncryptCentral.ConsoleUtils;
 using static LetsEncryptCentral.PathUtils;
 
@@ -168,7 +168,7 @@ namespace LetsEncryptCentral.Commands
             }
             catch(Exception ex)
             {
-                ConsoleErrorOutput($"Could not initialize dns provider file: {ex.Message}");
+                ConsoleErrorOutput($"Could not initialize dns provider: {ex.Message}");
                 goto errorHandling;
             }
             return context;

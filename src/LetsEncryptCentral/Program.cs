@@ -1,8 +1,8 @@
-﻿using System;
-using Microsoft.Extensions.CommandLineUtils;
-using System.Reflection;
+﻿using LetsEncryptCentral.CertManager;
 using LetsEncryptCentral.Commands;
-using LetsEncryptCentral.CertManager;
+using Microsoft.Extensions.CommandLineUtils;
+using System;
+using System.Reflection;
 using static LetsEncryptCentral.ConsoleUtils;
 
 namespace LetsEncryptCentral
