@@ -14,7 +14,7 @@ namespace LetsEncryptCentral.Commands
         {
             command.Description = "Create a new Let's Encrypt registration.";
 
-            var optionTos = command.Option("--accept-tos", "Accept to the terms of services and subscriber agreement at https://letsencrypt.org/repository/", CommandOptionType.NoValue);
+            var optionTos = command.Option("--accept-tos", "Accept to the terms of services", CommandOptionType.NoValue);
             var optionContact = command.Option("-c|--contact <CONTACT_EMAIL>", "Email address to contact.", CommandOptionType.SingleValue);
             var optionOutReg = command.Option("-r|--out-reg <REGISTERTION_OUTPUT_FILE>", "A file path to output registeration information.", CommandOptionType.SingleValue);
             var optionOutSigner = command.Option("-s|--out-signer <REGISTERTION_OUTPUT_SIGNER>", "A file path to output signer information corresponds to the registeration.", CommandOptionType.SingleValue);
@@ -37,7 +37,7 @@ namespace LetsEncryptCentral.Commands
         {
             if (!options.AcceptTos)
             {
-                ConsoleErrorOutput("Could not create a registration before you accept the terms of services at https://letsencrypt.org/repository/.");
+                ConsoleErrorOutput("Could not create a registration before you accept the terms of services at https://letsencrypt.org/repository/.\r\nPlease specify --accept-tos option to accept the terms of services.");
                 return 11;
             }
             UseDefaultOptionsIfNeed(ref options);

@@ -17,7 +17,7 @@ Here are the sample commands:
 
 ```powershell
 cd release
-.\lec.exe reg --contact user@example.com --out-reg C:\Users\MyUserName\Desktop\reg.json --out-signer C:\Users\MyUserName\Desktop\signer.key
+.\lec.exe reg --accept-tos --contact user@example.com --out-reg C:\Users\MyUserName\Desktop\reg.json --out-signer C:\Users\MyUserName\Desktop\signer.key
 .\lec.exe apply name.ciznx.com -out C:\Users\MyUserName\Desktop\cert.pfx --out-type pfx --reg C:\Users\MyUserName\Desktop\reg.json --signer C:\Users\MyUserName\Desktop\signer.key --dns DnsPod --dns-conf "token_id=1234;token=822321668afcefe;domain=example.com"
 ```
 
