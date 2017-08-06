@@ -8,6 +8,13 @@ using System.Net.Http.Headers;
 
 namespace LetsEncryptCentral.DnsProviders
 {
+    /// <summary>
+    /// The implemetation of using the DnsPod DNS service
+    /// </summary>
+    /// <remarks>
+    /// Users should provide api tokens and other common parameters to use DnsPod provider
+    /// Please follow the documentation to see how to get these values: https://www.dnspod.cn/docs/info.html#common-parameters
+    /// </remarks>
     class DnsPodProvider : IDnsProvider
     {
         readonly HttpClient _httpClient = new HttpClient();

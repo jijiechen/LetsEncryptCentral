@@ -18,7 +18,8 @@ namespace LetsEncryptCentral.Commands
     {
         static readonly Dictionary<string, Type> AllSupportedDnsProviderTypes = new Dictionary<string, Type>
         {
-            {"DnsPod", typeof(DnsPodProvider) }
+            {"DnsPod", typeof(DnsPodProvider) },
+            {"Azure", typeof(AzureProvider) }
         };
 
 
