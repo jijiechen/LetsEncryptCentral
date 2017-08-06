@@ -67,7 +67,8 @@ namespace LetsEncryptCentral.Commands
 
         int Execute(RequestNewCertificateOptions options)
         {
-            if(OptionsInBadFormat(options, out int errorCode))
+            int errorCode;
+            if (OptionsInBadFormat(options, out errorCode))
             {
                 return errorCode;
             }
@@ -85,7 +86,8 @@ namespace LetsEncryptCentral.Commands
             try
             {
                 Console.WriteLine("Done.");
-                if (IsSubDomainName(options.CommonName, out string toplevel))
+                string toplevel;
+                if (IsSubDomainName(options.CommonName, out toplevel))
                 {
                     Console.Write("Authorizing top level domain name {0}...", toplevel);
                     DnsAuthorizer.Authorize(client, requestContext.DnsProvider, toplevel);
@@ -107,7 +109,8 @@ namespace LetsEncryptCentral.Commands
                 {
                     options.OutputFile = Path.Combine(AppliationPath, string.Concat(options.CommonName, '-', DateTime.Now.ToString("yyyyMMddHHmm"), '.', outTypeString));
                 }
-                options.OutputFile = PrepareOutputFilePath(options.OutputFile, out string dir);
+                string dir;
+                options.OutputFile = PrepareOutputFilePath(options.OutputFile, out dir);
                 CertificateExporter.Export(certProvider, cert, options.OutputType, options.OutputFile);
                 Console.WriteLine("Certificate has been exported as {0} format at {1}.", outTypeString, options.OutputFile); 
             }

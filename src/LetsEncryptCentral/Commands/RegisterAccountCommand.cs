@@ -10,7 +10,7 @@ namespace LetsEncryptCentral.Commands
 {
     class RegisterAccountCommand
     {
-        public void Setup(CommandLineApplication command)
+        public void Setup(CommandLineApplication command
         {
             command.Description = "Create a new Let's Encrypt registration.";
 
@@ -80,7 +80,8 @@ namespace LetsEncryptCentral.Commands
             }
             else
             {
-                options.OutputPathRegisteration = PrepareOutputFilePath(options.OutputPathRegisteration, out string dir);
+                string dir;
+                options.OutputPathRegisteration = PrepareOutputFilePath(options.OutputPathRegisteration, out dir);
                 if (string.IsNullOrWhiteSpace(options.OutputPathSigner))
                     options.OutputPathSigner = Path.Combine(dir, contactGuid + ".signer.key");
             }
@@ -91,7 +92,8 @@ namespace LetsEncryptCentral.Commands
             }
             else
             {
-                options.OutputPathSigner = PrepareOutputFilePath(options.OutputPathSigner, out string dir);
+                string dir;
+                options.OutputPathSigner = PrepareOutputFilePath(options.OutputPathSigner, out dir);
                 if (string.IsNullOrWhiteSpace(options.OutputPathRegisteration))
                     options.OutputPathRegisteration = Path.Combine(dir, contactGuid + ".reg.json");
             }

@@ -31,7 +31,10 @@ if NOT "%MSBUILDEXEDIR%" == "" GOTO :MsBuildFound
 "%local%.nuget\NuGet.exe" restore "%local%LetsEncryptCentral.sln"
 @ECHO Building...
 "%MSBUILDEXE%" "%local%LetsEncryptCentral.sln" /t:Rebuild /P:Configuration=Release
-IF ERRORLEVEL 1 GOTO :end
+IF ERRORLEVEL 1 (
+	SET CtxErrCode=%ERRORLEVEL%
+	GOTO :end
+)
 @goto copy
 
 
@@ -51,7 +54,7 @@ robocopy "%local%src\LetsEncryptCentral\bin\Release" "%local%release" /e
 
 :MsBuildNotFound
 @echo Could not found msbuild
-@SET CtxErrCode=2
+@SET CtxErrCode=4
 @goto end
 
 

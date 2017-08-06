@@ -26,7 +26,8 @@ namespace LetsEncryptCentral.CertManager
                 alternativeNames = new List<string>();
             }
 
-            var csr = GenerateCSR(certProvider, hostName, alternativeNames, out PrivateKey pk);
+            PrivateKey pk;
+            var csr = GenerateCSR(certProvider, hostName, alternativeNames, out pk);
 
             var certRequest = client.RequestCertificate(JwsHelper.Base64UrlEncode(csr));
             if (certRequest.StatusCode != HttpStatusCode.Created)
