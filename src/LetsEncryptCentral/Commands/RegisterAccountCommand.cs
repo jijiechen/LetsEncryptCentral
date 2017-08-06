@@ -10,7 +10,7 @@ namespace LetsEncryptCentral.Commands
 {
     class RegisterAccountCommand
     {
-        public void Setup(CommandLineApplication command
+        public void Setup(CommandLineApplication command)
         {
             command.Description = "Create a new Let's Encrypt registration.";
 

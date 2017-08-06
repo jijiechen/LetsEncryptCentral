@@ -1,6 +1,9 @@
 LetsEncryptCentral
 --------
 
+
+[![Build status](https://ci.appveyor.com/api/projects/status/3pkc96dqc597i133?svg=true)](https://ci.appveyor.com/project/jijiechen/letsencryptcentral)
+
 LetsEncryptCentral(**lec.exe**) is a utility that helps apply domain validation certificates from the open [Let's encrypt](https://letsencrypt.org/) CA. LetsEncryptCentral uses the [DNS-01 challenge](https://letsencrypt.org/how-it-works/) to prove your ownership of the domain name to Let's Encrypt CA.
 
 LetsEncryptCentral can be used to apply certificates for non-webserver service endpoints, it also can be used as a centralized certificate management tool for requesting and renewing Let's Encrypt certificates.
@@ -11,7 +14,7 @@ This project is in early development, hence not ready for production usage. Use 
 1. Clone this project, run the `.\Build.bat` to compile;
 1. Run the **lec.exe** from the `release` output directory;
 1. Create a new registration profile if this is your first running;
-1. Apply a certificate using your registration profile (Currently, only DnsPod dynamic DNS service is supported, more DNS service provider is on the way).
+1. Apply a certificate using your registration profile (Currently, DnsPod dynamic DNS service and Azure DNS service are supported, more DNS service providers are on the way).
 
 Here are the sample commands:
 
@@ -22,7 +25,7 @@ cd release
 ```
 
 ## Contributing and license
-Pull requests are welcome. The next step is to support more dynamic DNS providers, such as Azure DNS, AWS Router and Google DNS services. The future plan is wrap the core as a web service to provide out-of-box centralized certificate manageability.
+Pull requests are welcome. The next step is to support more dynamic DNS providers, AWS Router and Google DNS services. The future plan is wrap the core as a web service to provide out-of-box centralized certificate manageability.
 
 The source code of this project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
