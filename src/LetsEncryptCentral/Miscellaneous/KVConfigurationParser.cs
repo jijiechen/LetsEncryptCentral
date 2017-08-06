@@ -8,13 +8,16 @@ namespace LetsEncryptCentral
     {
         public static Dictionary<string, string> Parse(string configuration, string[] requiredConfKeys = null)
         {
-            var encoderReplacement = string.Format("${0}$", Guid.NewGuid().ToString("N").Substring(28));
+            var semicolonReplacement = string.Format("${0}$", Guid.NewGuid().ToString("N").Substring(28));
+            var equalSignReplacement = string.Format("${0}$", Guid.NewGuid().ToString("N").Substring(28));
 
             var conf = configuration
-                        .Replace(";;", encoderReplacement)
+                        .Replace(";;", semicolonReplacement)
+                        .Replace("==", equalSignReplacement)
                         .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
-                        .Select(part => part.Replace(encoderReplacement, ";").Split('='))
-                        .Select(parts => new KeyValuePair<string, string>(parts[0], string.Join("=", parts.Skip(1)) /* Values can contain '=' */ ))
+                        .Select(part => part.Replace(semicolonReplacement, ";").Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries))
+                        .Where(parts => parts.Length > 1)
+                        .Select(parts => new KeyValuePair<string, string>(parts[0], parts[1].Replace(equalSignReplacement, "=")))
                         .Aggregate(new Dictionary<string, string>(), (dic, item) => { dic[item.Key] = item.Value; return dic; });
 
             if (requiredConfKeys != null)
