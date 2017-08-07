@@ -8,20 +8,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using static LetsEncryptCentral.ConsoleUtils;
 using static LetsEncryptCentral.PathUtils;
 
 namespace LetsEncryptCentral.Commands
 {
-
     class RequestCertificateCommand
     {
-        static readonly Dictionary<string, Type> AllSupportedDnsProviderTypes = new Dictionary<string, Type>
-        {
-            {"DnsPod", typeof(DnsPodProvider) },
-            {"Azure", typeof(AzureProvider) }
-        };
-
+        static Dictionary<string, Type> AllSupportedDnsProviderTypes = null;
 
         public void Setup(CommandLineApplication command)
         {
@@ -60,10 +56,13 @@ namespace LetsEncryptCentral.Commands
                     opt.OutputType = outType;
                 }
 
+                if (AllSupportedDnsProviderTypes == null)
+                {
+                    AllSupportedDnsProviderTypes = DnsProviderTypeDiscoverer.Discover();
+                }
                 return Execute(opt);
             });
         }
-
 
         int Execute(RequestNewCertificateOptions options)
         {
@@ -125,21 +124,7 @@ namespace LetsEncryptCentral.Commands
             return 0;
         }
 
-        static bool IsSubDomainName(string domainName, out string toplevel)
-        {
-            var parts = domainName.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
-
-            if(parts.Length > 2)
-            {
-                toplevel = string.Concat(parts[parts.Length - 2], '.', parts[parts.Length - 1]);
-                return true;
-            }
-
-            toplevel = domainName;
-            return false;
-        }
-
-        private CertRequestContext InitializeRequestContext(RequestNewCertificateOptions options)
+        CertRequestContext InitializeRequestContext(RequestNewCertificateOptions options)
         {
             var context = new CertRequestContext();
 
@@ -214,8 +199,21 @@ namespace LetsEncryptCentral.Commands
             
             exitCode = 0;
             return false;
-        }
+        }      
 
+        static bool IsSubDomainName(string domainName, out string toplevel)
+        {
+            var parts = domainName.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if(parts.Length > 2)
+            {
+                toplevel = string.Concat(parts[parts.Length - 2], '.', parts[parts.Length - 1]);
+                return true;
+            }
+
+            toplevel = domainName;
+            return false;
+        }
 
         class CertRequestContext
         {

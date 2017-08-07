@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace LetsEncryptCentral
 {
-    class KVConfigurationParser
+    public class KVConfigurationParser
     {
         public static Dictionary<string, string> Parse(string configuration, string[] requiredConfKeys = null)
         {

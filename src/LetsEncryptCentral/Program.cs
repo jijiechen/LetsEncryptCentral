@@ -7,7 +7,7 @@ using static LetsEncryptCentral.ConsoleUtils;
 
 namespace LetsEncryptCentral
 {
-    class Program
+    public class Program
     {
         public const string ApplicationName = "lec";
         public static CertManagerConfiguration GlobalConfiguration = new CertManagerConfiguration();

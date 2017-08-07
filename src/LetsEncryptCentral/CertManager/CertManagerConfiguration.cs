@@ -1,6 +1,6 @@
 ﻿namespace LetsEncryptCentral.CertManager
 {
-    class CertManagerConfiguration
+    public class CertManagerConfiguration
     {
 #if DEBUG
         public string AcmeServerBaseUri { get; set; } = "https://acme-staging.api.letsencrypt.org/";

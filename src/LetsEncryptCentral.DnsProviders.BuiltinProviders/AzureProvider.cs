@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Rest.Azure.Authentication;
 using Microsoft.Azure.Management.Dns;
 using Microsoft.Azure.Management.Dns.Models;
+using Microsoft.Rest.Azure.Authentication;
 
-namespace LetsEncryptCentral.DnsProviders
+namespace LetsEncryptCentral.DnsProviders.BuiltinProviders
 {
     /// <summary>
     /// Manage DNS records using the Azure DNS
@@ -14,7 +14,8 @@ namespace LetsEncryptCentral.DnsProviders
     /// Please see documentation at https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-integrating-applications 
     /// Or https://go.microsoft.com/fwlink/?LinkID=623000&clcid=0x409
     /// </remarks>
-    class AzureProvider : IDnsProvider
+    [DnsProvider("Azure")]
+    public class AzureProvider : IDnsProvider
     {
         DnsManagementClient dnsClient;
         string resourceGroupName;
@@ -52,11 +53,11 @@ namespace LetsEncryptCentral.DnsProviders
                 },
                 Metadata = new Dictionary<string, string>
                 {
-                    {"created_by", Program.ApplicationName},
+                    {"created_by", LetsEncryptCentral.Program.ApplicationName},
                     {"created_at_utc", DateTime.UtcNow.ToString("o")}
                 }
             };
-            
+
             var recordSet = dnsClient.RecordSets.CreateOrUpdateAsync(
                 resourceGroupName,
                 dnszoneName,
@@ -70,8 +71,8 @@ namespace LetsEncryptCentral.DnsProviders
         public void RemoveTxtRecord(string recordRef)
         {
             dnsClient.RecordSets.Delete(
-                resourceGroupName, 
-                dnszoneName, 
+                resourceGroupName,
+                dnszoneName,
                 recordRef,
                 RecordType.TXT);
         }
