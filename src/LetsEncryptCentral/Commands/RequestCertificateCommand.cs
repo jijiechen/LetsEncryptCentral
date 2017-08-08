@@ -190,9 +190,10 @@ namespace LetsEncryptCentral.Commands
                 return true;
             }
 
-            if (!AllSupportedDnsProviderTypes.Keys.Contains(options.DnsProviderName))
+            if (!AllSupportedDnsProviderTypes.ContainsKey(options.DnsProviderName))
             {
-                ConsoleErrorOutput($"Unknown DNS provider '{options.DnsProviderName}'. The supported providers are: {AllSupportedDnsProviderTypes}");
+                var allKeys = string.Join(",", AllSupportedDnsProviderTypes.Keys);
+                ConsoleErrorOutput($"Unknown DNS provider '{options.DnsProviderName}'. The supported providers are: {allKeys}");
                 exitCode = 24;
                 return true;
             }
